@@ -157,11 +157,14 @@ State.prototype.record = function(section_name, record) {
         rdata = self.encode(record.data, 2) // Adjust for the rdata length
         break
       case 'IN TXT':
-        rdata = record.data.map(function(part) {
-          part = new Buffer(part)
-          return [part.length, part]
-        })
-        break
+      	if(Array.isArray(record.data)) {
+	      rdata = record.data.map(function(part) {
+	        part = new Buffer(part)
+	        return [part.length, part]
+	      })
+        } else {
+	      rdata = [];
+        }
       case 'IN SRV':
         rdata = [ buf16(record.data.priority)
                 , buf16(record.data.weight)
