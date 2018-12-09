@@ -157,12 +157,19 @@ State.prototype.record = function(section_name, record) {
         rdata = self.encode(record.data, 2) // Adjust for the rdata length
         break
       case 'IN TXT':
-        rdata = record.data.map(function(part) {
-          part = new Buffer(part)
-          return [part.length, part]
-        })
-        break
+      	if(Array.isArray(record.data)) {
+	      rdata = record.data.map(function(part) {
+	        part = new Buffer(part)
+	        return [part.length, part]
+	      })
+        } else {
+	      rdata = [];
+        }
       case 'IN SRV':
+      	if( !record.data ) {
+	      	rdata = [];
+	      	break;
+      	}
         rdata = [ buf16(record.data.priority)
                 , buf16(record.data.weight)
                 , buf16(record.data.port)
@@ -170,12 +177,20 @@ State.prototype.record = function(section_name, record) {
                 ]
         break
       case 'IN DS':
+      	if( !record.data ) {
+	      	rdata = [];
+	      	break;
+      	}
         rdata = [ buf16(record.data.key_tag)
                 , new Buffer([record.data.algorithm])
                 , new Buffer([record.data.digest_type])
                 , new Buffer(record.data.digest)
                 ]
         break
+      	if( !record.data ) {
+	      	rdata = [];
+	      	break;
+      	}
       case 'IN SSHFP':
         rdata = [ new Buffer([record.algorithm])
                 , new Buffer([record.fp_type])
